@@ -1,7 +1,7 @@
 # Stock Portfolio Management Service
 
 This microservice manages user investment portfolios, holdings, and transactions.
-Built with **Spring Boot, WebFlux, and MySQL**.
+Built with **Spring Boot, JWT Authentication , WebFlux, and MySQL**.
 
 ## Features
 - User Portfolio Management (login and register)
@@ -9,9 +9,14 @@ Built with **Spring Boot, WebFlux, and MySQL**.
 - Transaction Logging (BUY/SELL)
 - Global Exception Handling
 - Portfolio Overview with details of holding and capability to add and remove from holdings
-
+- Scheduler is there to update the real time stock price. Please un-comment it while running the applciation once the application is fully ready and you 
+  can change it in PortfolioScheduler at line 22. We have commented as the free api from AplhaVantage has limit of 25 hits per day per key. This is used to calculate the total portfoloi evaluation. Please uncomment once you are ready to observe the Portfolio evaluation.
+- The search also uses AlphaVantage key for search the scrip symbols.
+- SecurityConfig needs to be changed with angular application base url to allow angular aaplication.
+    
 ## Tech Stack
 - **Backend:** Java 17, Spring Boot 3.4.3, Spring WebFlux
+- **FrontEnd** Angular CLI version 13.3.4
 - **Database:** MySQL 8.x 
 - **Build Tool:** Maven
 
@@ -92,3 +97,14 @@ Change the application.yml file with the connections
 Swagger uri
 http://localhost:8080/swagger-ui/index.html
 To use stock portfolio management apis please generate the authtoken and then call the apis.
+
+Angular Changes
+Please change the backend url in Angular front end applciation in environment.ts file.
+
+
+### Further imporvments 
+- There is less logging. If required it can be added.
+- Api gateway can be added
+- More testcases to add from ui and backend
+- user roles and profiles can be added also.
+- the applciation is using ROLE_USER  
