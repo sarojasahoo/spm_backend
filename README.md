@@ -9,7 +9,10 @@ Built with **Spring Boot, WebFlux, and MySQL**.
 - Transaction Logging (BUY/SELL)
 - Global Exception Handling
 - Portfolio Overview with details of holding and capability to add and remove from holdings
-
+- Scheduler is there to update the real time stock price. Please un-comment it while running the applciation once the application is fully ready and you 
+  can change it in PortfolioScheduler at line 22. We have commented as the free api from AplhaVantage has limit of 25 hits per day per key. This is used to calculate the total portfoloi evaluation. Please uncomment once you are ready to observe the Portfolio evaluation.
+- The search also uses AlphaVantage key for search the scrip symbols.
+    
 ## Tech Stack
 - **Backend:** Java 17, Spring Boot 3.4.3, Spring WebFlux
 - **Database:** MySQL 8.x 
