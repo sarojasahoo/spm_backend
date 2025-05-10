@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,11 +53,11 @@ public class StockListControllerTest {
     public void testDeleteStock() {
         String token = "dummy-token";
         // Arrange: Stub deletion to return an empty Mono.
-        when(stockListService.deleteByStockSymbol("AAPL")).thenReturn(Mono.empty());
+        when(stockListService.deleteByStockSymbolAndUserId("AAPL","user123")).thenReturn(Mono.empty());
 
         // Act & Assert: DELETE /api/stocks/delete/AAPL should return 204 No Content.
         webTestClient.delete()
-                .uri("/AAPL")
+                .uri("/AAPL/user123")
                 .header("Authorization", "Bearer " + token)
                 .exchange()
                 .expectStatus().isNoContent();

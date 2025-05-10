@@ -65,10 +65,10 @@ class StockListControllerIntegrationTest {
 
     @Test
     public void testDeleteStockIntegration() {
-        when(stockListService.deleteByStockSymbol(eq("AAPL"))).thenReturn(Mono.empty());
+        when(stockListService.deleteByStockSymbolAndUserId(eq("AAPL"),eq("user123"))).thenReturn(Mono.empty());
 
         webTestClient.delete()
-                .uri("/api/stocksList/AAPL")
+                .uri("/api/stocksList/AAPL/user123")
                 .header(HttpHeaders.AUTHORIZATION, getValidToken())
                 .exchange()
                 .expectStatus().isNoContent();
