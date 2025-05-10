@@ -28,7 +28,7 @@ class StockListControllerIntegrationTest {
     private StockListService stockListService;
 
     @InjectMocks
-    private StockListController stockListController; // ✅ Controller under test
+    private StockListController stockListController; // Controller under test
 
     @Mock
     private JwtUtil jwtUtil;
@@ -40,7 +40,7 @@ class StockListControllerIntegrationTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        webTestClient = WebTestClient.bindToController(stockListController).build(); // ✅ Manually bind the controller
+        webTestClient = WebTestClient.bindToController(stockListController).build(); // Manually bind the controller
     }
 
     @Test
@@ -49,7 +49,7 @@ class StockListControllerIntegrationTest {
         sampleStock.setStockSymbol("AAPL");
         sampleStock.setUserId("user123");
 
-        // ✅ Mock behavior
+        //  Mock behavior
         when(stockListService.addStock(any(StockList.class))).thenReturn(Mono.just(sampleStock));
 
         webTestClient.post()

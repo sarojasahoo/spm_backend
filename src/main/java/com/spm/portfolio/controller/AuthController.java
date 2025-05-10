@@ -30,45 +30,29 @@ public class AuthController {
         }
 
         String jwt = authHeader.substring(7);
-        String username;
-
         try {
-            username = jwtUtil.extractUsername(jwt);
             return Mono.just(jwtUtil.validateToken(jwt));
         } catch (Exception ex) {
             throw new InvalidTokenException("Invalid or expired token");
         }
     }
 
-    @PostMapping("/login")
-    public Mono<String> login(@RequestBody LoginRequestDto loginRequestDto, ServerHttpResponse response) {
-        return userDetailsService.findByUserId(loginRequestDto.getUserId())
-                .flatMap(userDetails -> {
-                    if (passwordEncoder.matches(loginRequestDto.getPassword(), userDetails.getPassword())) {
-                        String jwtToken = jwtUtil.generateToken(loginRequestDto.getUserId());
-                        ResponseCookie cookie = ResponseCookie.from("Bearer", jwtToken)
-                                .httpOnly(true)   // Prevent JavaScript access (Security)
-                                .secure(true)     // Set to true if using HTTPS
-                                .path("/")        // Cookie is available across the site
-                                .maxAge(3600)     // 1 hour expiration
-                                .sameSite("Strict") // Prevent CSRF attacks
-                                .build();
-                        ResponseCookie userIdcookie = ResponseCookie.from("userId", loginRequestDto.getUserId())
-                                .httpOnly(true)   // Prevent JavaScript access (Security)
-                                .secure(true)     // Set to true if using HTTPS
-                                .path("/")        // Cookie is available across the site
-                                .maxAge(3600)     // 1 hour expiration
-                                .sameSite("Strict") // Prevent CSRF attacks
-                                .build();
-                        response.addCookie(cookie);
-                        response.addCookie(userIdcookie);
-                        TokenDto tokenDto =TokenDto.builder().access_token(jwtToken).
-                                userId(userDetails.getUsername()).build();
-                        return Mono.just(jwtToken);
-                    } else {
-                        return Mono.error(new InvalidCredentialsException("Invalid credentials"));
-                    }
-                });
 
-    }
+   @PostMapping("/login")
+   public Mono<TokenDto> login(@RequestBody LoginRequestDto loginRequestDto) {
+       return userDetailsService.findByUserId(loginRequestDto.getUserId())
+               .flatMap(userDetails -> {
+                   if (passwordEncoder.matches(loginRequestDto.getPassword(), userDetails.getPassword())) {
+                       String jwtToken = jwtUtil.generateToken(loginRequestDto.getUserId());
+                       TokenDto tokenDto = TokenDto.builder()
+                               .access_token(jwtToken)
+                               .userId(loginRequestDto.getUserId())
+                               .userName(userDetails.getUsername())
+                               .build();
+                       return Mono.just(tokenDto);
+                   } else {
+                       return Mono.error(new InvalidCredentialsException("Invalid credentials"));
+                   }
+               });
+   }
 }

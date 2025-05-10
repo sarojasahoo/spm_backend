@@ -64,6 +64,7 @@ public class AuthControllerTest {
         // Prepare a user object that represents what is stored in your database.
         User userDetails = new User();
         userDetails.setUserId("user123");
+        userDetails.setUserName("user test");
         String encodedPassword = "encodedPassword";
         userDetails.setPassword(encodedPassword);
 
@@ -82,8 +83,10 @@ public class AuthControllerTest {
                 .bodyValue(loginRequest)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class)
-                .isEqualTo(jwtToken);
+                .expectBody()
+                .jsonPath("$.access_token").isEqualTo(jwtToken)
+                .jsonPath("$.userName").isEqualTo("user test")
+                .jsonPath("$.userId").isEqualTo("user123");
     }
 
 }
