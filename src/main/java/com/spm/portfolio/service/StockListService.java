@@ -23,7 +23,7 @@ public class StockListService {
     // Add a stock to the list with transaction management
     @Transactional
     public Mono<StockList> addStock(StockList stock) {
-        Mono<StockList> stockListMono = stockListRepository.findByStockSymbol(stock.getStockSymbol());
+        Mono<StockList> stockListMono = stockListRepository.findByStockSymbolAndUserId(stock.getStockSymbol(),stock.getUserId());
         return stockListMono.flatMap(scrip -> {
             log.info("Stock already present in stock list {}",scrip.getStockSymbol());
             return Mono.just(scrip);
@@ -37,5 +37,10 @@ public class StockListService {
     @Transactional
     public Mono<Void> deleteByStockSymbol(String stockName) {
         return stockListRepository.deleteByStockSymbol(stockName);
+    }
+
+    @Transactional
+    public Mono<Void>  deleteByStockSymbolAndUserId(String stockSymbol,String userId) {
+        return stockListRepository.deleteByStockSymbolAndUserId(stockSymbol,userId);
     }
 }

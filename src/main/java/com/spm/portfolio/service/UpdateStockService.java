@@ -43,7 +43,7 @@ public class UpdateStockService {
                 .distinct();
     }
     public Mono<Void> updatePortfolioCurrentPrice(String symbol) {
-        return portfolioRepository.findByStockSymbol(symbol)
+        return portfolioRepository.findPortfoliosByStockSymbol(symbol)
                 .switchIfEmpty(Mono.error(new RuntimeException("Symbol not found: " + symbol))) // Ensure symbol exists
                 .flatMap(portfolio -> stockService.getRealTimeStockPrice(symbol)
                         .flatMap(stockDto -> {
@@ -63,10 +63,10 @@ public class UpdateStockService {
     }
 
     public Mono<Void> updateStockListCurrentPrice(String symbol) {
-        return stockListRepository.findByStockSymbol(symbol)
+        return stockListRepository.findStockListByStockSymbol(symbol)
                 .switchIfEmpty(Mono.error(new RuntimeException("Symbol not found: " + symbol))) // Ensure symbol exists
                 .flatMap(stock -> stockService.getRealTimeStockPrice(symbol)
-                        .flatMap(stockDto -> {
+                        .flatMap(stockDto ->    {
                             stock.setCurrentPrice(stockDto.getCurrentPrice());
                             return stockListRepository.save(stock);
                         })

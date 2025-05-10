@@ -24,9 +24,9 @@ public class StockListController {
     }
 
     // Delete a stock from the list.
-    @DeleteMapping("/{stockSymbol}")
-    public Mono<ResponseEntity<Void>> deleteStock(@PathVariable String stockSymbol) {
-        return stockListService.deleteByStockSymbol(stockSymbol)
+    @DeleteMapping("/{stockSymbol}/{userId}")
+    public Mono<ResponseEntity<Void>> deleteStock(@PathVariable String stockSymbol,@PathVariable String userId) {
+        return stockListService.deleteByStockSymbolAndUserId(stockSymbol,userId)
                 .then(Mono.just(ResponseEntity.noContent().build()));
     }
 

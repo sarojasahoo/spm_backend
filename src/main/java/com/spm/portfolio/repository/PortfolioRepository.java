@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 
 public interface PortfolioRepository extends R2dbcRepository<Portfolio, Long> {
     Mono<Portfolio> findByStockSymbol(String symbol);
-
+    Flux<Portfolio> findPortfoliosByStockSymbol(String symbol);
    Mono<Portfolio> getPortfolioStockByUserIdAndStockSymbol(String userId, String symbol);
 
     Flux<Portfolio> findAllByUserId(String userId);
