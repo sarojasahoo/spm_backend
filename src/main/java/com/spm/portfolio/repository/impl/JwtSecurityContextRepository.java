@@ -2,6 +2,7 @@
 package com.spm.portfolio.repository.impl;
 
 import com.spm.portfolio.util.JwtUtil;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,6 +13,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.List;
 
 public class JwtSecurityContextRepository implements ServerSecurityContextRepository {
     private final JwtUtil jwtUtil;
@@ -27,12 +29,23 @@ public class JwtSecurityContextRepository implements ServerSecurityContextReposi
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
-        return Mono.justOrEmpty(exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
-                .filter(authHeader -> authHeader.startsWith("Bearer "))
-                .map(authHeader -> authHeader.substring(7))
+        return extractToken(exchange)
                 .filter(jwtUtil::validateToken)
-                .map(token -> new SecurityContextImpl(new UsernamePasswordAuthenticationToken(
-                        jwtUtil.extractUsername(token), null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-                )));
+                .map(jwtUtil::extractUsername)
+                .map(username -> {
+                    List<SimpleGrantedAuthority> authorities =
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+                    var auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                    return new SecurityContextImpl(auth);
+                });
+    }
+    private Mono<String> extractToken(ServerWebExchange exchange) {
+       // use http cookie
+        HttpCookie jwtCookie = exchange.getRequest().getCookies().getFirst("jwt");
+        if (jwtCookie != null) {
+            return Mono.just(jwtCookie.getValue());
+        }
+
+        return Mono.empty();
     }
 }

@@ -48,7 +48,8 @@ public class AuthControllerTest {
         // Act & Assert: Call GET /api/auth/token with the token in the Authorization header.
         webTestClient.get()
                 .uri("/token")
-                .header("Authorization", "Bearer " + token)
+                .cookie("jwt",token)
+                .cookie("XSRF-TOKEN",token)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Boolean.class)
@@ -84,7 +85,6 @@ public class AuthControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.access_token").isEqualTo(jwtToken)
                 .jsonPath("$.userName").isEqualTo("user test")
                 .jsonPath("$.userId").isEqualTo("user123");
     }

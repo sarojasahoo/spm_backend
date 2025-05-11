@@ -13,6 +13,8 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
+import org.springframework.security.web.server.csrf.ServerCsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import reactor.core.publisher.Mono;
 
@@ -28,12 +30,25 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                //.csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(new ServerCsrfTokenRequestAttributeHandler()) // Step 2
+                )
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOrigins(List.of("http://localhost:4200","http://192.168.0.121:4200")); // Allow UI URL
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+                    config.setAllowedHeaders(List.of(
+                            "Authorization",
+                            "Content-Type",
+                            "X-XSRF-TOKEN"    //  required for CSRF header to pass
+                    ));
+
+                    config.setExposedHeaders(List.of(
+                            "XSRF-TOKEN"       //  allows browser to read the Set-Cookie header for CSRF
+                    ));
+
                     config.setAllowCredentials(true);
                     return config;
                 }))
@@ -44,7 +59,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/webjars/**",
                                 "/api-docs/**",
-                                        "/api/auth/**", "/api/user/**","/actuator/**"
+                                        "/api/auth/**", "/api/user/**","/actuator/**","/api/csrf/**"
                         ).permitAll()
                         .pathMatchers("/api/av/stock/**","/api/stocksList/**","/api/portfolio/**")
                                 .authenticated()

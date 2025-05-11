@@ -6,10 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -63,9 +66,9 @@ import static org.mockito.Mockito.*;
         @Test
         void load_ShouldReturnEmptyMono_WhenNoAuthorizationHeaderPresent() {
             HttpHeaders headers = new HttpHeaders();
-
+            MultiValueMap<String, HttpCookie> cookieMultiValueMap =  new LinkedMultiValueMap<>();
+            when(request.getCookies()).thenReturn(cookieMultiValueMap);
             when(request.getHeaders()).thenReturn(headers);
-
             Mono<SecurityContext> result = securityContextRepository.load(exchange);
 
             StepVerifier.create(result)

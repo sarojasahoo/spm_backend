@@ -10,7 +10,6 @@ import lombok.ToString;
 @Data
 public class TokenDto {
 
-    private String access_token;
     private String userId;
     private String userName;
 }

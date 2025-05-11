@@ -41,7 +41,8 @@ public class SecurityIntegrationTest {
         String token = getValidToken();
         webTestClient.get()
                 .uri("/api/auth/token")
-                .header("Authorization", token)
+                .cookie("jwt",token)
+                .cookie("XSRF-TOKEN",token)
                 .exchange()
                 .expectStatus().isOk();
     }
